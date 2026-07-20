@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Designer Soft — Costing</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+  :root {
+    --bg: #07070e;
+    --bg-gradient: linear-gradient(135deg, #07070e 0%, #0f0f1a 50%, #0a0a14 100%);
+    --surface: rgba(18, 18, 26, 0.7);
+    --surface-elevated: rgba(26, 26, 36, 0.85);
+    --glass: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --border: rgba(201, 169, 110, 0.12);
+    --border-glow: rgba(201, 169, 110, 0.25);
+    --text-primary: #f5f5fa;
+    --text-secondary: #a0a0b8;
+    --text-muted: #606070;
+    --accent: #d4af37;
+    --accent-bright: #f0c850;
+    --accent-dim: #b8942a;
+    --accent-glow: rgba(212, 175, 55, 0.2);
+    --accent-glow-strong: rgba(212, 175, 55, 0.4);
+    --success: #4ade80;
+    --danger: #f87171;
+    --purple: #a78bfa;
+    --pink: #f472b6;
+    --teal: #2dd4bf;
+    --orange: #fb923c;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    background-image: 
+      radial-gradient(ellipse at 20% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(167, 139, 250, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(45, 212, 191, 0.03) 0%, transparent 70%);
+    background-attachment: fixed;
+    color: var(--text-primary);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .app { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; }
+  .app::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+      radial-gradient(circle at 30% 20%, rgba(212, 175, 55, 0.03) 0%, transparent 40%),
+      radial-gradient(circle at 70% 80%, rgba(167, 139, 250, 0.02) 0%, transparent 40%);
+    pointer-events: none;
+    z-index: 0;
+    animation: ambientShift 20s ease-in-out infinite;
+  }
+  @keyframes ambientShift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(-2%, 1%) scale(1.02); }
+    66% { transform: translate(1%, -2%) scale(0.98); }
+  }
+
+  .header {
+    background: linear-gradient(180deg, rgba(18,18,26,0.9) 0%, rgba(7,7,14,0.6) 100%);
+    padding: 32px 20px 24px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent-bright), var(--accent), transparent);
+    opacity: 0.6;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: 50%;
+    transform: translateX(-50%);
+    width: 120px; height: 60px;
+    background: radial-gradient(ellipse, var(--accent-glow-strong) 0%, transparent 70%);
+    filter: blur(20px);
+    pointer-events: none;
+  }
+  .header .logo-mark {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 50%, var(--accent-bright) 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 4s ease infinite;
+    border-radius: 16px;
+    margin: 0 auto 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    box-shadow: 
+      0 8px 32px var(--accent-glow),
+      0 0 0 1px rgba(212, 175, 55, 0.3),
+      inset 0 1px 0 rgba(255,255,255,0.2);
+    position: relative;
+    z-index: 1;
+  }
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  .header h1 {
+    font-size: 26px; font-weight: 800;
+    letter-spacing: -0.8px;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header p {
+    font-size: 11px; font-weight: 600;
+    color: var(--accent-dim);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  .nav {
+    display: flex; gap: 6px;
+    padding: 14px 16px;
+    background: transparent;
+    position: relative;
+    z-index: 1;
+  }
+  .nav-btn {
+    flex: 1; padding: 12px 8px;
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    font-size: 11px; font-weight: 700;
+    background: var(--glass);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+  }
+  .nav-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 0%, rgba(212, 175, 55, 0.05) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .nav-btn:hover::before { opacity: 1; }
+  .nav-btn:hover {
+    border-color: var(--border-glow);
+    color: var(--text-secondary);
+    transform: translateY(-1px);
+  }
+  .nav-btn.active {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+    color: var(--accent-bright);
+    border-color: var(--accent-dim);
+    box-shadow: 
+      0 0 20px var(--accent-glow),
+      inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .nav-btn.active::before { opacity: 1; }
+
+  .content { padding: 0 16px 100px; position: relative; z-index: 1; }
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .summary-card {
+    background: linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 50%, rgba(26,26,36,0.6) 100%);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 28px 22px;
+    margin: 16px 0;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    box-shadow: 
+      0 8px 32px rgba(0,0,0,0.3),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .summary-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent-bright), var(--accent), transparent);
+    opacity: 0.8;
+  }
+  .summary-card::after {
+    content: '';
+    position: absolute;
+    top: -50%; right: -20%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .summary-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin-bottom: 20px;
+  }
+  .sum-item { text-align: center; position: relative; }
+  .sum-item::after {
+    content: ''; position: absolute; right: -8px; top: 10%; height: 80%;
+    width: 1px; background: linear-gradient(180deg, transparent, var(--border), transparent);
+  }
+  .sum-item:nth-child(2n)::after { display: none; }
+  .sum-val {
+    font-size: 22px; font-weight: 700;
+    color: var(--text-primary);
+    display: block; margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+  }
+  .sum-lbl {
+    font-size: 9px; font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .sum-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 16px 0;
+  }
+  .sum-total {
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .sum-total-lbl {
+    font-size: 10px; font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+  }
+  .sum-total-val {
+    font-size: 34px; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-bright) 0%, var(--accent) 50%, var(--accent-dim) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -1px;
+    font-variant-numeric: tabular-nums;
+    filter: drop-shadow(0 0 8px var(--accent-glow));
+  }
+  .profit-track { margin-top: 16px; }
+  .profit-track-bg {
+    height: 6px;
+    background: rgba(18, 18, 26, 0.8);
+    border-radius: 3px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+  }
+  .profit-track-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-dim), var(--accent), var(--accent-bright));
+    border-radius: 3px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 12px var(--accent-glow);
+    position: relative;
+  }
+  .profit-track-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 20px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+    border-radius: 0 3px 3px 0;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 14px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  }
+  .card:hover {
+    border-color: var(--border-glow);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2), 0 0 0 1px rgba(212, 175, 55, 0.08);
+    transform: translateY(-2px);
+  }
+  .card-title {
+    font-size: 12px; font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 20px 0;
+    display: flex; align-items: center; gap: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .card-title .icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    color: var(--accent);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1);
+  }
+
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label {
+    display: block; font-size: 10px; font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .field input, .field select {
+    width: 100%; padding: 16px 18px;
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    font-size: 15px; font-weight: 500;
+    background: rgba(10, 10, 18, 0.6);
+    color: var(--text-primary);
+    -webkit-appearance: none; appearance: none;
+    transition: all 0.3s ease;
+    font-variant-numeric: tabular-nums;
+    backdrop-filter: blur(10px);
+  }
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--accent-dim);
+    box-shadow: 
+      0 0 0 3px var(--accent-glow),
+      0 0 20px rgba(212, 175, 55, 0.1);
+    background: rgba(10, 10, 18, 0.8);
+  }
+  .field input::placeholder { color: var(--text-muted); }
+  .field .hint {
+    font-size: 10px; color: var(--text-muted);
+    margin-top: 6px; font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  #custom-size-field {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    animation: fadeSlideUp 0.3s ease;
+  }
+
+  .btn {
+    width: 100%; padding: 18px;
+    border: none; border-radius: 14px;
+    font-size: 12px; font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center; gap: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .btn:hover::before { opacity: 1; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 50%, var(--accent-bright) 100%);
+    background-size: 200% 200%;
+    color: var(--bg);
+    box-shadow: 
+      0 4px 24px var(--accent-glow),
+      0 0 0 1px rgba(212, 175, 55, 0.3);
+  }
+  .btn-primary:hover {
+    background-position: 100% 0;
+    box-shadow: 
+      0 8px 32px var(--accent-glow-strong),
+      0 0 0 1px rgba(212, 175, 55, 0.4);
+    transform: translateY(-2px);
+  }
+  .btn-primary:active { transform: translateY(0) scale(0.98); }
+  .btn-secondary {
+    background: var(--surface-elevated);
+    color: var(--text-secondary);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+  }
+  .btn-secondary:hover {
+    border-color: var(--border-glow);
+    color: var(--text-primary);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    transform: translateY(-1px);
+  }
+  .btn-secondary:active { transform: translateY(0); }
+  .btn-danger {
+    background: linear-gradient(135deg, rgba(248,113,113,0.12) 0%, rgba(248,113,113,0.06) 100%);
+    color: var(--danger);
+    border: 1px solid rgba(248,113,113,0.2);
+    backdrop-filter: blur(10px);
+  }
+  .btn-danger:hover {
+    box-shadow: 0 4px 16px rgba(248,113,113,0.15);
+    transform: translateY(-1px);
+  }
+  .btn-group { display: flex; gap: 12px; margin-top: 18px; }
+  .btn-group .btn { flex: 1; }
+
+  .saved-empty {
+    text-align: center; padding: 56px 24px;
+    color: var(--text-muted);
+  }
+  .saved-empty .big-icon {
+    font-size: 48px; margin-bottom: 20px;
+    opacity: 0.25;
+    filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.2));
+  }
+  .saved-empty p { font-size: 13px; line-height: 1.7; }
+
+  .saved-item {
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+  }
+  .saved-item::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+  }
+  .saved-item:hover {
+    border-color: var(--border-glow);
+    box-shadow: 
+      0 8px 32px rgba(0,0,0,0.3),
+      0 0 0 1px rgba(212, 175, 55, 0.08);
+    transform: translateY(-2px) scale(1.01);
+  }
+  .saved-item:active { transform: scale(0.99); }
+  .saved-item .info { flex: 1; min-width: 0; }
+  .saved-item .name {
+    font-weight: 600; font-size: 14px;
+    color: var(--text-primary);
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 4px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .saved-item .meta {
+    font-size: 11px; color: var(--text-muted);
+    font-weight: 500;
+  }
+  .saved-item .price {
+    font-size: 20px; font-weight: 700;
+    background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+    margin-left: 12px;
+    filter: drop-shadow(0 0 4px var(--accent-glow));
+  }
+  .saved-item .delete-btn {
+    position: absolute; right: -6px; top: -6px;
+    width: 24px; height: 24px;
+    background: linear-gradient(135deg, var(--danger), #ef4444);
+    color: #fff; border: none;
+    border-radius: 50%;
+    font-size: 12px; font-weight: 700;
+    display: none; align-items: center;
+    justify-content: center;
+    cursor: pointer; z-index: 2;
+    box-shadow: 0 4px 12px rgba(248,113,113,0.3);
+    transition: all 0.2s ease;
+  }
+  .saved-item .delete-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(248,113,113,0.4);
+  }
+  .saved-item:hover .delete-btn { display: flex; animation: popIn 0.2s ease; }
+  @keyframes popIn {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+  }
+
+  .badge {
+    display: inline-block; padding: 3px 10px;
+    border-radius: 8px; font-size: 9px;
+    font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.8px;
+    flex-shrink: 0;
+    backdrop-filter: blur(10px);
+  }
+  .badge-sandal { background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.08)); color: var(--accent); border: 1px solid rgba(212,175,55,0.2); }
+  .badge-slipper { background: linear-gradient(135deg, rgba(74,222,128,0.1), rgba(74,222,128,0.05)); color: var(--success); border: 1px solid rgba(74,222,128,0.15); }
+  .badge-chappal { background: linear-gradient(135deg, rgba(139,92,246,0.12), rgba(139,92,246,0.06)); color: var(--purple); border: 1px solid rgba(139,92,246,0.15); }
+  .badge-flipflop { background: linear-gradient(135deg, rgba(244,114,182,0.1), rgba(244,114,182,0.05)); color: var(--pink); border: 1px solid rgba(244,114,182,0.15); }
+  .badge-ladies-sandal { background: linear-gradient(135deg, rgba(244,114,182,0.1), rgba(244,114,182,0.05)); color: var(--pink); border: 1px solid rgba(244,114,182,0.15); }
+  .badge-gents-sandal { background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(59,130,246,0.05)); color: #60a5fa; border: 1px solid rgba(59,130,246,0.15); }
+  .badge-kids-sandal { background: linear-gradient(135deg, rgba(251,146,60,0.1), rgba(251,146,60,0.05)); color: var(--orange); border: 1px solid rgba(251,146,60,0.15); }
+  .badge-slides { background: linear-gradient(135deg, rgba(45,212,191,0.1), rgba(45,212,191,0.05)); color: var(--teal); border: 1px solid rgba(45,212,191,0.15); }
+
+  .breakdown-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .breakdown-table th {
+    text-align: left; padding: 12px 14px;
+    background: rgba(26, 26, 36, 0.6);
+    color: var(--text-muted);
+    font-weight: 700; font-size: 9px;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .breakdown-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(42,42,53,0.5);
+    color: var(--text-secondary);
+    transition: background 0.2s ease;
+  }
+  .breakdown-table tr:hover td {
+    background: rgba(212, 175, 55, 0.02);
+  }
+  .breakdown-table .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+  .breakdown-table .sub { color: var(--text-muted); font-size: 11px; }
+  .breakdown-table .total-row {
+    background: linear-gradient(135deg, rgba(26,26,36,0.8), rgba(26,26,36,0.6));
+    font-weight: 700;
+  }
+  .breakdown-table .total-row td { 
+    color: var(--accent-bright); 
+    text-shadow: 0 0 8px rgba(212, 175, 55, 0.2);
+  }
+
+  .search-bar {
+    width: 100%; padding: 16px 18px 16px 48px;
+    border: 1px solid var(--glass-border);
+    border-radius: 14px; font-size: 14px;
+    margin-bottom: 14px;
+    background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%235a5a6a' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'/%3E%3C/svg%3E") no-repeat 18px center;
+    color: var(--text-primary);
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+  .search-bar:focus { 
+    outline: none; 
+    border-color: var(--accent-dim); 
+    box-shadow: 0 0 0 3px var(--accent-glow), 0 0 20px rgba(212, 175, 55, 0.1);
+  }
+  .search-bar::placeholder { color: var(--text-muted); }
+
+  .filter-tabs {
+    display: flex; gap: 8px;
+    margin-bottom: 14px; overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+  }
+  .filter-tabs::-webkit-scrollbar { display: none; }
+  .filter-tab {
+    padding: 8px 16px; border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass);
+    font-size: 10px; font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer; white-space: nowrap;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    backdrop-filter: blur(10px);
+  }
+  .filter-tab:hover {
+    border-color: var(--border-glow);
+    color: var(--text-secondary);
+    transform: translateY(-1px);
+  }
+  .filter-tab.active {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(212, 175, 55, 0.05));
+    color: var(--accent-bright);
+    border-color: var(--accent-dim);
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+
+  .toast {
+    position: fixed; bottom: 28px; left: 50%;
+    transform: translateX(-50%) translateY(120px);
+    background: linear-gradient(135deg, rgba(26,26,36,0.95), rgba(18,18,26,0.95));
+    color: var(--text-primary);
+    padding: 16px 32px; border-radius: 14px;
+    font-size: 13px; font-weight: 700;
+    opacity: 0; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    box-shadow: 
+      0 12px 40px rgba(0,0,0,0.4),
+      0 0 0 1px rgba(212, 175, 55, 0.15),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
+    pointer-events: none;
+    max-width: 90%; text-align: center;
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(20px);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(7,7,14,0.85);
+    backdrop-filter: blur(12px);
+    display: none; align-items: center;
+    justify-content: center;
+    z-index: 200; padding: 16px;
+  }
+  .modal-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: linear-gradient(145deg, rgba(26,26,36,0.95), rgba(18,18,26,0.95));
+    border: 1px solid var(--glass-border);
+    border-radius: 24px; padding: 28px;
+    width: 100%; max-width: 380px;
+    max-height: 80vh; overflow-y: auto;
+    box-shadow: 
+      0 24px 48px rgba(0,0,0,0.5),
+      0 0 0 1px rgba(212, 175, 55, 0.1),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+    backdrop-filter: blur(20px);
+    animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal h3 {
+    margin: 0 0 18px;
+    font-size: 20px; font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+  .modal .btn-group { margin-top: 24px; }
+
+  .stats-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; margin-bottom: 18px;
+  }
+  .stat-box {
+    background: linear-gradient(145deg, var(--surface), rgba(26,26,36,0.5));
+    border: 1px solid var(--glass-border);
+    border-radius: 18px; padding: 22px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+  }
+  .stat-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  }
+  .stat-box:hover {
+    border-color: var(--border-glow);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    transform: translateY(-2px);
+  }
+  .stat-val {
+    font-size: 28px; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 6px;
+    filter: drop-shadow(0 0 6px var(--accent-glow));
+  }
+  .stat-lbl {
+    font-size: 9px; color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+  }
+
+  .toggle-row {
+    display: flex; justify-content: space-between;
+    align-items: center; padding: 16px 0;
+    border-bottom: 1px solid rgba(42,42,53,0.5);
+  }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-lbl { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+  .toggle-switch { position: relative; width: 52px; height: 28px; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider {
+    position: absolute; cursor: pointer; inset: 0;
+    background: var(--glass);
+    border-radius: 28px;
+    transition: 0.3s;
+    border: 1px solid var(--glass-border);
+  }
+  .toggle-slider:before {
+    position: absolute; content: "";
+    height: 22px; width: 22px;
+    left: 2px; bottom: 2px;
+    background: linear-gradient(135deg, var(--text-muted), var(--text-secondary));
+    border-radius: 50%; transition: 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .toggle-switch input:checked + .toggle-slider { 
+    background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.1));
+    border-color: var(--accent-dim);
+  }
+  .toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+    background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+
+  @media (min-width: 768px) {
+    .app { max-width: 520px; }
+  }
+
+
+  /* ===== PASSWORD GATE ===== */
+  #password-gate {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    background-image: 
+      radial-gradient(ellipse at 20% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(167, 139, 250, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(45, 212, 191, 0.03) 0%, transparent 70%);
+    z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    padding: 24px;
+  }
+  #password-gate.hidden { display: none; }
+  .gate-card {
+    background: linear-gradient(145deg, var(--surface-elevated) 0%, var(--surface) 100%);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px 32px;
+    width: 100%; max-width: 360px;
+    text-align: center;
+    backdrop-filter: blur(20px);
+    box-shadow: 
+      0 24px 48px rgba(0,0,0,0.4),
+      0 0 0 1px rgba(212, 175, 55, 0.08),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+    position: relative;
+    overflow: hidden;
+  }
+  .gate-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent-bright), var(--accent), transparent);
+    opacity: 0.8;
+  }
+  .gate-logo {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 50%, var(--accent-bright) 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 4s ease infinite;
+    border-radius: 18px;
+    margin: 0 auto 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    box-shadow: 
+      0 8px 32px var(--accent-glow),
+      0 0 0 1px rgba(212, 175, 55, 0.3),
+      inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+  .gate-card h2 {
+    font-size: 22px; font-weight: 800;
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .gate-card .subtitle {
+    font-size: 11px; font-weight: 600;
+    color: var(--accent-dim);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .gate-card .field {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  .gate-card .field label {
+    display: block; font-size: 10px; font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .gate-card input[type="password"],
+  .gate-card input[type="text"] {
+    width: 100%; padding: 16px 18px;
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    font-size: 16px; font-weight: 500;
+    background: rgba(10, 10, 18, 0.6);
+    color: var(--text-primary);
+    -webkit-appearance: none; appearance: none;
+    transition: all 0.3s ease;
+    text-align: center;
+    letter-spacing: 2px;
+  }
+  .gate-card input:focus {
+    outline: none;
+    border-color: var(--accent-dim);
+    box-shadow: 
+      0 0 0 3px var(--accent-glow),
+      0 0 20px rgba(212, 175, 55, 0.1);
+    background: rgba(10, 10, 18, 0.8);
+  }
+  .gate-card input::placeholder { color: var(--text-muted); letter-spacing: 1px; }
+  .gate-error {
+    color: var(--danger);
+    font-size: 12px; font-weight: 600;
+    margin-top: -10px; margin-bottom: 16px;
+    min-height: 18px;
+    text-align: center;
+  }
+  .gate-hint {
+    font-size: 11px; color: var(--text-muted);
+    margin-top: 20px; line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<!-- PASSWORD GATE -->
+<div id="password-gate">
+  <div class="gate-card">
+    <div class="gate-logo">&#9670;</div>
+    <h2>Designer Soft</h2>
+    <p class="subtitle">Authorized Access Only</p>
+    <div class="field">
+      <label>Access Code</label>
+      <input type="password" id="gate-password" placeholder="Enter password" autocomplete="off" onkeydown="if(event.key==='Enter')checkPassword()">
+    </div>
+    <div class="gate-error" id="gate-error"></div>
+    <button class="btn btn-primary" onclick="checkPassword()" style="margin-bottom:8px;">Unlock</button>
+    <p class="gate-hint">Contact admin if you need access.<br>This page is for authorized personnel only.</p>
+  </div>
+</div>
+
+<div class="app" id="main-app" style="display:none;">
+  <div class="header">
+    <div class="logo-mark">◆</div>
+    <h1>Designer Soft</h1>
+    <p>Costing System</p>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn active" data-panel="calculator">Calculator</button>
+    <button class="nav-btn" data-panel="saved">Article</button>
+    <button class="nav-btn" data-panel="settings">Settings</button>
+  </div>
+
+  <div class="content">
+    <div id="panel-calculator" class="panel active">
+      <div class="summary-card">
+        <div class="summary-grid">
+          <div class="sum-item"><span class="sum-val" id="d-material">₨0.00</span><span class="sum-lbl">Material</span></div>
+          <div class="sum-item"><span class="sum-val" id="d-labor">₨0.00</span><span class="sum-lbl">Labor</span></div>
+          <div class="sum-item"><span class="sum-val" id="d-overhead">₨0.00</span><span class="sum-lbl">Overhead</span></div>
+          <div class="sum-item"><span class="sum-val" id="d-profit">₨0.00</span><span class="sum-lbl">Profit</span></div>
+        </div>
+        <div class="sum-divider"></div>
+        <div class="sum-total">
+          <span class="sum-total-lbl">Cost Per Pair</span>
+          <span class="sum-total-val" id="d-total">₨0.00</span>
+        </div>
+        <div class="profit-track">
+          <div class="profit-track-bg"><div class="profit-track-fill" id="profit-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="icon">◈</div>Article Details</div>
+        <div class="field">
+          <label>Article Name</label>
+          <input type="text" id="p-name" placeholder="e.g. Ladies Sandal 1023">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Type</label>
+            <select id="p-type">
+              <option value="sandal">PU Sandal</option>
+              <option value="slipper">PU Slipper</option>
+              <option value="ladies-sandal">Ladies</option>
+              <option value="gents-sandal">Gents</option>
+              <option value="kids-sandal">Kids</option>
+              <option value="slides">Slides</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Quantity</label>
+            <input type="number" id="p-qty" value="500" min="1">
+          </div>
+        </div>
+        <div class="field">
+          <label>Size Range</label>
+          <select id="p-size">
+            <option value="7-10">7–10</option>
+            <option value="3-10">3–10</option>
+            <option value="4-6">4–6</option>
+            <option value="1-3">1–3</option>
+            <option value="11-13">11–13</option>
+            <option value="6-9">6–9</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div class="field" id="custom-size-field" style="display:none;">
+          <label>Custom Size</label>
+          <input type="text" id="p-size-custom" placeholder="e.g. 5-8, 9-11">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="icon">◈</div>Materials</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Synthetic Leather</label>
+            <input type="number" id="m-upper" value="0" min="0" step="0.5">
+          </div>
+          <div class="field">
+            <label>PU Chemical</label>
+            <input type="number" id="m-pu" value="0" min="0" step="0.5">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Release Agent</label>
+            <input type="number" id="m-release" value="0" min="0" step="0.5">
+          </div>
+          <div class="field">
+            <label>Pigment</label>
+            <input type="number" id="m-pigment" value="0" min="0" step="0.5">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Labels</label>
+            <input type="number" id="m-label" value="0" min="0" step="0.5">
+          </div>
+          <div class="field">
+            <label>Packaging</label>
+            <input type="number" id="m-pack" value="0" min="0" step="0.5">
+          </div>
+        </div>
+        <div class="field">
+          <label>Other</label>
+          <input type="number" id="m-other" value="0" min="0" step="0.5">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="icon">◈</div>Labor</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Upper Making</label>
+            <input type="number" id="l-upper" value="0" min="0" step="0.1">
+            <div class="hint">Synthetic leather upper preparation</div>
+          </div>
+          <div class="field">
+            <label>Cutting</label>
+            <input type="number" id="l-cut" value="0" min="0" step="0.1">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Moulding</label>
+            <input type="number" id="l-mould" value="0" min="0" step="0.1">
+          </div>
+          <div class="field">
+            <label>Packing Dept</label>
+            <input type="number" id="l-packing-dept" value="0" min="0" step="0.1">
+            <div class="hint">Trimming, Finishing, Packing, QC</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="icon">◈</div>Overhead & Margin</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Overhead %</label>
+            <input type="number" id="o-pct" value="12" min="0" max="100" step="1">
+          </div>
+          <div class="field">
+            <label>Transport</label>
+            <input type="number" id="o-trans" value="0" min="0" step="0.5">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Profit %</label>
+            <input type="number" id="o-profit" value="15" min="0" max="100" step="1">
+          </div>
+          <div class="field">
+            <label>Wastage %</label>
+            <input type="number" id="o-waste" value="3" min="0" max="50" step="1">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="icon">◈</div>Breakdown</div>
+        <table class="breakdown-table">
+          <thead><tr><th>Item</th><th class="num">Pair</th><th class="num">Batch</th><th class="num">%</th></tr></thead>
+          <tbody id="breakdown-body"><tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:24px;">Enter values</td></tr></tbody>
+        </table>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="saveArticle()">Save</button>
+          <button class="btn btn-secondary" onclick="copySummary()">Copy</button>
+        </div>
+        <button class="btn btn-secondary" onclick="resetFields()" style="margin-top:10px;">Reset</button>
+      </div>
+    </div>
+
+    <div id="panel-saved" class="panel">
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-val" id="stat-count">0</div><div class="stat-lbl">Articles</div></div>
+        <div class="stat-box"><div class="stat-val" id="stat-avg">₨0</div><div class="stat-lbl">Average</div></div>
+      </div>
+      <input type="text" class="search-bar" id="search-saved" placeholder="Search articles...">
+      <div class="filter-tabs" id="filter-tabs">
+        <div class="filter-tab active" data-filter="all">All</div>
+        <div class="filter-tab" data-filter="sandal">Sandal</div>
+        <div class="filter-tab" data-filter="slipper">Slipper</div>
+        <div class="filter-tab" data-filter="ladies-sandal">Ladies</div>
+        <div class="filter-tab" data-filter="gents-sandal">Gents</div>
+        <div class="filter-tab" data-filter="kids-sandal">Kids</div>
+        <div class="filter-tab" data-filter="slides">Slides</div>
+      </div>
+      <div id="saved-list">
+        <div class="saved-empty"><div class="big-icon">◈</div><p>No articles saved.<br>Calculate and save your first article.</p></div>
+      </div>
+      <div class="btn-group" style="margin-top:16px;">
+        <button class="btn btn-secondary" onclick="exportCSV()">Export CSV</button>
+        <button class="btn btn-danger" onclick="clearAll()">Clear All</button>
+      </div>
+    </div>
+
+    <div id="panel-settings" class="panel">
+      <div class="card">
+        <div class="card-title"><div class="icon">◈</div>Defaults</div>
+        <div class="field-row">
+          <div class="field"><label>Overhead %</label><input type="number" id="def-overhead" value="12"></div>
+          <div class="field"><label>Profit %</label><input type="number" id="def-profit" value="15"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>Wastage %</label><input type="number" id="def-waste" value="3"></div>
+          <div class="field">
+            <label>Currency</label>
+            <select id="sel-currency">
+              <option value="₨" selected>₨ Pakistani Rupee</option>
+              <option value="₹">₹ Indian Rupee</option>
+              <option value="$">$ US Dollar</option>
+              <option value="€">€ Euro</option>
+              <option value="£">£ British Pound</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveDefaults()" style="margin-top:14px;">Save Defaults</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="icon">◈</div>Data</div>
+        <div class="toggle-row">
+          <span class="toggle-lbl">Auto-save draft</span>
+          <label class="toggle-switch"><input type="checkbox" id="auto-save"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-lbl">Profit indicator</span>
+          <label class="toggle-switch"><input type="checkbox" id="show-profit" checked><span class="toggle-slider"></span></label>
+        </div>
+        <button class="btn btn-secondary" onclick="backupData()" style="margin-top:14px;">Backup</button>
+        <button class="btn btn-secondary" onclick="restoreData()" style="margin-top:10px;">Restore</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="icon">◈</div>Guide</div>
+        <div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">
+          <p><strong style="color:var(--text-primary)">1.</strong> Enter article name, type, and quantity.</p>
+          <p><strong style="color:var(--text-primary)">2.</strong> Fill material costs — synthetic leather, PU chemical, release agent, pigment, labels, packaging.</p>
+          <p><strong style="color:var(--text-primary)">3.</strong> Add labor — upper making, cutting, moulding, and packing department (trimming, finishing, packing, QC combined).</p>
+          <p><strong style="color:var(--text-primary)">4.</strong> Set overhead, transport, profit margin, and wastage.</p>
+          <p><strong style="color:var(--text-primary)">5.</strong> Save article to archive permanently.</p>
+          <p style="margin-top:16px;color:var(--text-muted);font-size:12px;">
+            All data is stored locally in your browser. Use Backup to transfer between devices.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal">
+    <h3 id="modal-title">Title</h3>
+    <div id="modal-body"></div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmModal()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== PASSWORD GATE =====
+const ACCESS_PASSWORD = "designer2025"; // CHANGE THIS PASSWORD
+const SESSION_KEY = "ds_auth_session";
+const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 hours
+
+function checkPassword() {
+  const input = document.getElementById("gate-password").value.trim();
+  const error = document.getElementById("gate-error");
+  if (input === ACCESS_PASSWORD) {
+    const session = { granted: true, expires: Date.now() + SESSION_DURATION };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    unlockApp();
+  } else {
+    error.textContent = "Incorrect password. Try again.";
+    document.getElementById("gate-password").value = "";
+    document.getElementById("gate-password").focus();
+    setTimeout(() => { error.textContent = ""; }, 3000);
+  }
+}
+
+function unlockApp() {
+  document.getElementById("password-gate").classList.add("hidden");
+  document.getElementById("main-app").style.display = "block";
+  initApp();
+}
+
+function isSessionValid() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SESSION_KEY));
+    return s && s.granted && Date.now() < s.expires;
+  } catch(e) { return false; }
+}
+
+// On load: check session
+if (isSessionValid()) {
+  unlockApp();
+}
+
+
+// ===== STORAGE =====
+const STORAGE_KEY = 'designersoft_costings_v4';
+const SETTINGS_KEY = 'designersoft_settings_v4';
+
+function loadData() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; } }
+function saveData(data) { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
+function loadSettings() { try { return JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}'); } catch(e) { return {}; } }
+function saveSettings(s) { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
+
+let articles = [];
+let settings = {};
+let currency = '\u20A8';
+let currentFilter = 'all';
+let searchQuery = '';
+let modalCallback = null;
+
+// ===== PANEL NAVIGATION =====
+function showPanel(panelName) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + panelName).classList.add('active');
+}
+
+// ===== FORMATTING =====
+function fmt(n) { return currency + (n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+function fmtShort(n) { return currency + Math.round(n || 0).toLocaleString('en-IN'); }
+
+// ===== CALCULATION =====
+function calculate() {
+  const qty = parseFloat(document.getElementById('p-qty').value) || 1;
+
+  const mat = {
+    upper: parseFloat(document.getElementById('m-upper').value) || 0,
+    pu: parseFloat(document.getElementById('m-pu').value) || 0,
+    release: parseFloat(document.getElementById('m-release').value) || 0,
+    pigment: parseFloat(document.getElementById('m-pigment').value) || 0,
+    label: parseFloat(document.getElementById('m-label').value) || 0,
+    pack: parseFloat(document.getElementById('m-pack').value) || 0,
+    other: parseFloat(document.getElementById('m-other').value) || 0
+  };
+  const totalMat = mat.upper + mat.pu + mat.release + mat.pigment + mat.label + mat.pack + mat.other;
+
+  const wastePct = parseFloat(document.getElementById('o-waste').value) || 0;
+  const matWithWaste = totalMat * (1 + wastePct / 100);
+
+  const labor = {
+    upper: parseFloat(document.getElementById('l-upper').value) || 0,
+    cut: parseFloat(document.getElementById('l-cut').value) || 0,
+    mould: parseFloat(document.getElementById('l-mould').value) || 0,
+    packingDept: parseFloat(document.getElementById('l-packing-dept').value) || 0
+  };
+  const totalLabor = labor.upper + labor.cut + labor.mould + labor.packingDept;
+
+  const overheadPct = parseFloat(document.getElementById('o-pct').value) || 0;
+  const overheadTrans = parseFloat(document.getElementById('o-trans').value) || 0;
+  const overheadAmt = (matWithWaste + totalLabor) * (overheadPct / 100) + overheadTrans;
+
+  const baseCost = matWithWaste + totalLabor + overheadAmt;
+  const profitPct = parseFloat(document.getElementById('o-profit').value) || 0;
+  const profitAmt = baseCost * (profitPct / 100);
+  const finalPerPair = baseCost + profitAmt;
+  const totalBatch = finalPerPair * qty;
+
+  document.getElementById('d-material').textContent = fmt(matWithWaste);
+  document.getElementById('d-labor').textContent = fmt(totalLabor);
+  document.getElementById('d-overhead').textContent = fmt(overheadAmt);
+  document.getElementById('d-profit').textContent = fmt(profitAmt);
+  document.getElementById('d-total').textContent = fmt(finalPerPair);
+
+  const maxRef = finalPerPair * 0.5;
+  const barW = Math.min((profitAmt / maxRef) * 100, 100);
+  const fill = document.getElementById('profit-fill');
+  if (fill) fill.style.width = barW + '%';
+
+  const showProfit = document.getElementById('show-profit');
+  const track = document.querySelector('.profit-track');
+  if (track && showProfit) {
+    track.style.display = showProfit.checked ? 'block' : 'none';
+  }
+
+  const tbody = document.getElementById('breakdown-body');
+  const rows = [
+    { n: 'Synthetic Leather', v: mat.upper },
+    { n: 'PU Chemical', v: mat.pu },
+    { n: 'Release Agent', v: mat.release },
+    { n: 'Pigment', v: mat.pigment },
+    { n: 'Labels', v: mat.label },
+    { n: 'Packaging', v: mat.pack },
+    { n: 'Other', v: mat.other },
+    { n: 'Wastage (' + wastePct + '%)', v: matWithWaste - totalMat, sub: true },
+    { n: 'Upper Making', v: labor.upper },
+    { n: 'Cutting', v: labor.cut },
+    { n: 'Moulding', v: labor.mould },
+    { n: 'Packing Dept', v: labor.packingDept },
+    { n: 'Overhead', v: overheadAmt - overheadTrans, sub: true },
+    { n: 'Transport', v: overheadTrans },
+    { n: 'Profit (' + profitPct + '%)', v: profitAmt, sub: true },
+  ];
+  let html = '';
+  rows.forEach(r => {
+    const pct = finalPerPair > 0 ? ((r.v / finalPerPair) * 100).toFixed(1) : '0.0';
+    html += '<tr' + (r.sub ? ' class="sub"' : '') + '><td>' + r.n + '</td><td class="num">' + fmt(r.v) + '</td><td class="num">' + fmt(r.v * qty) + '</td><td class="num">' + pct + '%</td></tr>';
+  });
+  html += '<tr class="total-row"><td>Total</td><td class="num">' + fmt(finalPerPair) + '</td><td class="num">' + fmt(totalBatch) + '</td><td class="num">100%</td></tr>';
+  tbody.innerHTML = html;
+
+  return {
+    id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
+    name: document.getElementById('p-name').value.trim() || 'Unnamed',
+    type: document.getElementById('p-type').value,
+    qty: qty,
+    size: document.getElementById('p-size').value === 'custom' 
+      ? document.getElementById('p-size-custom').value.trim() || 'Custom'
+      : document.getElementById('p-size').value,
+    material: matWithWaste,
+    labor: totalLabor,
+    overhead: overheadAmt,
+    profit: profitAmt,
+    perPair: finalPerPair,
+    totalBatch: totalBatch,
+    date: new Date().toISOString(),
+    dateStr: new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }),
+    raw: {
+      mat: mat,
+      labor: labor,
+      overheadPct: overheadPct,
+      overheadTrans: overheadTrans,
+      profitPct: profitPct,
+      wastePct: wastePct
+    }
+  };
+}
+
+// ===== BIND INPUTS =====
+function bindInputs() {
+  const inputIds = ['p-name','p-type','p-qty','p-size','p-size-custom','m-upper','m-pu','m-release','m-pigment','m-label','m-pack','m-other','l-upper','l-cut','l-mould','l-packing-dept','o-pct','o-trans','o-profit','o-waste'];
+
+  // Handle custom size toggle
+  const sizeSelect = document.getElementById('p-size');
+  const customSizeField = document.getElementById('custom-size-field');
+  if (sizeSelect && customSizeField) {
+    sizeSelect.addEventListener('change', function() {
+      if (this.value === 'custom') {
+        customSizeField.style.display = 'block';
+        document.getElementById('p-size-custom').focus();
+      } else {
+        customSizeField.style.display = 'none';
+      }
+    });
+  }
+  inputIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', function() {
+        calculate();
+        if (document.getElementById('auto-save').checked) {
+          const draft = {};
+          inputIds.forEach(k => { const e = document.getElementById(k); if (e) draft[k] = e.value; });
+          settings.draft = draft;
+          saveSettings(settings);
+        }
+      });
+    }
+  });
+}
+
+// ===== SAVE ARTICLE =====
+function saveArticle() {
+  const data = calculate();
+  if (!document.getElementById('p-name').value.trim()) {
+    showToast('Enter article name');
+    document.getElementById('p-name').focus();
+    return;
+  }
+  articles.unshift(data);
+  saveData(articles);
+  showToast('Article saved');
+  renderSaved();
+}
+
+// ===== COPY =====
+function copySummary() {
+  const d = calculate();
+  const text = 'DESIGNER SOFT - COSTING\n' +
+    '---------------------\n' +
+    d.name + '\n' +
+    d.type.toUpperCase().replace(/-/g, ' ') + '\n' +
+    'Qty: ' + d.qty.toLocaleString('en-IN') + ' pairs | Size: ' + d.size + '\n\n' +
+    'Material: ' + fmt(d.material) + '\n' +
+    'Labor: ' + fmt(d.labor) + '\n' +
+    'Overhead: ' + fmt(d.overhead) + '\n' +
+    'Profit: ' + fmt(d.profit) + '\n\n' +
+    '---------------------\n' +
+    'Per Pair: ' + fmt(d.perPair) + '\n' +
+    'Total: ' + fmt(d.totalBatch) + '\n' +
+    '---------------------\n' +
+    d.dateStr;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => showToast('Copied'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Copied');
+  }
+}
+
+// ===== RESET =====
+function resetFields() {
+  if (!confirm('Reset all fields?')) return;
+  document.getElementById('p-name').value = '';
+  document.getElementById('p-qty').value = '500';
+  document.getElementById('m-upper').value = '0';
+  document.getElementById('m-pu').value = '0';
+  document.getElementById('m-release').value = '0';
+  document.getElementById('m-pigment').value = '0';
+  document.getElementById('m-label').value = '0';
+  document.getElementById('m-pack').value = '0';
+  document.getElementById('m-other').value = '0';
+  document.getElementById('l-upper').value = '0';
+  document.getElementById('l-cut').value = '0';
+  document.getElementById('l-mould').value = '0';
+  document.getElementById('l-packing-dept').value = '0';
+  document.getElementById('o-pct').value = settings.defaults ? settings.defaults.overhead : '12';
+  document.getElementById('o-trans').value = '0';
+  document.getElementById('o-profit').value = settings.defaults ? settings.defaults.profit : '15';
+  document.getElementById('o-waste').value = settings.defaults ? settings.defaults.wastage : '3';
+  calculate();
+  showToast('Reset');
+}
+
+// ===== RENDER SAVED =====
+function renderSaved() {
+  const list = document.getElementById('saved-list');
+  let filtered = articles;
+  if (currentFilter !== 'all') filtered = filtered.filter(a => a.type === currentFilter);
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    filtered = filtered.filter(a => a.name.toLowerCase().includes(q) || a.type.toLowerCase().includes(q));
+  }
+  document.getElementById('stat-count').textContent = articles.length;
+  const avg = articles.length > 0 ? articles.reduce((s, a) => s + a.perPair, 0) / articles.length : 0;
+  document.getElementById('stat-avg').textContent = fmtShort(avg);
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="saved-empty"><div class="big-icon">&#9670;</div><p>' + (articles.length === 0 ? 'No articles saved.<br>Calculate and save your first article.' : 'No matches.') + '</p></div>';
+    return;
+  }
+
+  let html = '';
+  filtered.forEach((item, idx) => {
+    const badgeClass = 'badge-' + (item.type.indexOf('sandal') !== -1 ? 'sandal' : item.type.indexOf('slipper') !== -1 ? 'slipper' : item.type);
+    const typeLabel = item.type.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    html += '<div class="saved-item" data-idx="' + idx + '"><button class="delete-btn" data-idx="' + idx + '" onclick="event.stopPropagation(); deleteArticle(' + idx + ')">&#215;</button><div class="info"><div class="name">' + escapeHtml(item.name) + ' <span class="badge ' + badgeClass + '">' + typeLabel + '</span></div><div class="meta">' + item.qty.toLocaleString('en-IN') + ' pairs &middot; ' + item.dateStr + '</div></div><div class="price">' + fmt(item.perPair) + '</div></div>';
+  });
+  list.innerHTML = html;
+
+  list.querySelectorAll('.saved-item').forEach(el => {
+    el.addEventListener('click', function(e) {
+      if (e.target.classList.contains('delete-btn')) return;
+      loadArticle(parseInt(this.dataset.idx));
+    });
+  });
+}
+
+function deleteArticle(idx) {
+  showModal('Delete', 'Delete "' + articles[idx].name + '"?', function() {
+    articles.splice(idx, 1);
+    saveData(articles);
+    renderSaved();
+    showToast('Deleted');
+  });
+}
+
+function loadArticle(idx) {
+  const item = articles[idx];
+  if (!item) return;
+  document.getElementById('p-name').value = item.name;
+  document.getElementById('p-type').value = item.type;
+  document.getElementById('p-qty').value = item.qty;
+  if (item.size && ['7-10','3-10','4-6','1-3','11-13','6-9'].indexOf(item.size) === -1 && item.size !== 'custom') {
+    document.getElementById('p-size').value = 'custom';
+    document.getElementById('custom-size-field').style.display = 'block';
+    document.getElementById('p-size-custom').value = item.size;
+  } else {
+    document.getElementById('p-size').value = item.size || '7-10';
+    document.getElementById('custom-size-field').style.display = 'none';
+  }
+  if (item.raw) {
+    const r = item.raw;
+    document.getElementById('m-upper').value = r.mat.upper;
+    document.getElementById('m-pu').value = r.mat.pu;
+    document.getElementById('m-release').value = r.mat.release;
+    document.getElementById('m-pigment').value = r.mat.pigment;
+    document.getElementById('m-label').value = r.mat.label;
+    document.getElementById('m-pack').value = r.mat.pack;
+    document.getElementById('m-other').value = r.mat.other;
+    document.getElementById('l-upper').value = r.labor.upper;
+    document.getElementById('l-cut').value = r.labor.cut;
+    document.getElementById('l-mould').value = r.labor.mould;
+    document.getElementById('l-packing-dept').value = r.labor.packingDept;
+    document.getElementById('o-pct').value = r.overheadPct;
+    document.getElementById('o-trans').value = r.overheadTrans;
+    document.getElementById('o-profit').value = r.profitPct;
+    document.getElementById('o-waste').value = r.wastePct;
+  }
+  calculate();
+  showPanel('calculator');
+  showToast('Loaded: ' + item.name);
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ===== SEARCH & FILTER =====
+function setFilter(filter) {
+  currentFilter = filter;
+  renderSaved();
+}
+
+// ===== EXPORT =====
+function exportCSV() {
+  if (articles.length === 0) { showToast('No data'); return; }
+  let csv = 'Article,Type,Quantity,Size,Material,Labor,Overhead,Profit,Per Pair,Total,Date\n';
+  articles.forEach(a => {
+    csv += '"' + a.name + '","' + a.type + '",' + a.qty + ',"' + (a.size || '') + '",' + a.material.toFixed(2) + ',' + a.labor.toFixed(2) + ',' + a.overhead.toFixed(2) + ',' + a.profit.toFixed(2) + ',' + a.perPair.toFixed(2) + ',' + a.totalBatch.toFixed(2) + ',"' + a.dateStr + '"\n';
+  });
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'designersoft_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Exported');
+}
+
+// ===== CLEAR ALL =====
+function clearAll() {
+  if (articles.length === 0) { showToast('Empty'); return; }
+  showModal('Clear All', 'Delete ' + articles.length + ' articles?', function() {
+    articles = [];
+    saveData(articles);
+    renderSaved();
+    showToast('Cleared');
+  });
+}
+
+// ===== SETTINGS =====
+function saveDefaults() {
+  settings.defaults = {
+    overhead: document.getElementById('def-overhead').value,
+    profit: document.getElementById('def-profit').value,
+    wastage: document.getElementById('def-waste').value
+  };
+  settings.currency = document.getElementById('sel-currency').value;
+  currency = settings.currency;
+  saveSettings(settings);
+  document.getElementById('o-pct').value = settings.defaults.overhead;
+  document.getElementById('o-profit').value = settings.defaults.profit;
+  document.getElementById('o-waste').value = settings.defaults.wastage;
+  calculate();
+  showToast('Defaults saved');
+}
+
+function backupData() {
+  const backup = { articles: articles, settings: settings, exported: new Date().toISOString() };
+  const json = JSON.stringify(backup, null, 2);
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(json).then(() => showToast('Backup copied'));
+  } else {
+    showModal('Backup', '<textarea style="width:100%;height:200px;font-size:12px;" readonly>' + escapeHtml(json) + '</textarea>', null, true);
+  }
+}
+
+function restoreData() {
+  showModal('Restore', '<textarea id="restore-input" style="width:100%;height:150px;font-size:12px;" placeholder="Paste JSON..."></textarea>', function() {
+    try {
+      const text = document.getElementById('restore-input').value.trim();
+      const data = JSON.parse(text);
+      if (data.articles) { articles = data.articles; saveData(articles); }
+      if (data.settings) { settings = data.settings; saveSettings(settings); }
+      showToast('Restored');
+      renderSaved();
+    } catch(e) {
+      showToast('Invalid data');
+    }
+  });
+}
+
+// ===== MODAL =====
+function showModal(title, bodyHtml, callback) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-overlay').classList.add('show');
+  modalCallback = callback;
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('show');
+  modalCallback = null;
+}
+
+function confirmModal() {
+  document.getElementById('modal-overlay').classList.remove('show');
+  if (modalCallback) modalCallback();
+  modalCallback = null;
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== INIT =====
+if (settings.defaults) {
+  document.getElementById('def-overhead').value = settings.defaults.overhead || 12;
+  document.getElementById('def-profit').value = settings.defaults.profit || 15;
+  document.getElementById('def-waste').value = settings.defaults.wastage || 3;
+}
+if (settings.currency) document.getElementById('sel-currency').value = settings.currency;
+if (settings.autoSave) document.getElementById('auto-save').checked = true;
+if (settings.showProfit !== undefined) document.getElementById('show-profit').checked = settings.showProfit;
+if (settings.draft) {
+  Object.keys(settings.draft).forEach(k => {
+    const el = document.getElementById(k);
+    if (el) el.value = settings.draft[k];
+  });
+  if (settings.draft['p-size'] === 'custom') {
+    document.getElementById('custom-size-field').style.display = 'block';
+  }
+}
+
+document.getElementById('auto-save').addEventListener('change', function(e) {
+  settings.autoSave = e.target.checked;
+  saveSettings(settings);
+});
+
+document.getElementById('show-profit').addEventListener('change', function(e) {
+  settings.showProfit = e.target.checked;
+  saveSettings(settings);
+  calculate();
+});
+
+document.getElementById('search-saved').addEventListener('input', function(e) {
+  searchQuery = e.target.value;
+  renderSaved();
+});
+
+// Event delegation for nav buttons
+}
+
+document.querySelector('.nav').addEventListener('click', function(e) {
+  if (e.target.classList.contains('nav-btn')) {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    showPanel(e.target.dataset.panel);
+  }
+});
+
+// Event delegation for filter tabs
+document.getElementById('filter-tabs').addEventListener('click', function(e) {
+  if (e.target.classList.contains('filter-tab')) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+    setFilter(e.target.dataset.filter);
+  }
+});
+
+function initApp() {
+  articles = loadData();
+  settings = loadSettings();
+  currency = settings.currency || "\u20A8";
+  bindInputs();
+  calculate();
+</script>
+</body>
+</html>
