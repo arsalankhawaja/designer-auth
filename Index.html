@@ -1183,7 +1183,6 @@ function isSessionValid() {
   } catch(e) { return false; }
 }
 
-// On load: check session
 if (isSessionValid()) {
   unlockApp();
 }
@@ -1611,7 +1610,12 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ===== INIT =====
+
+function initApp() {
+  articles = loadData();
+  settings = loadSettings();
+  currency = settings.currency || '\u20A8';
+
 if (settings.defaults) {
   document.getElementById('def-overhead').value = settings.defaults.overhead || 12;
   document.getElementById('def-profit').value = settings.defaults.profit || 15;
@@ -1647,8 +1651,6 @@ document.getElementById('search-saved').addEventListener('input', function(e) {
 });
 
 // Event delegation for nav buttons
-}
-
 document.querySelector('.nav').addEventListener('click', function(e) {
   if (e.target.classList.contains('nav-btn')) {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -1665,13 +1667,10 @@ document.getElementById('filter-tabs').addEventListener('click', function(e) {
     setFilter(e.target.dataset.filter);
   }
 });
-
-function initApp() {
-  articles = loadData();
-  settings = loadSettings();
-  currency = settings.currency || "\u20A8";
   bindInputs();
   calculate();
+}
+
 </script>
 </body>
 </html>
